@@ -57,7 +57,7 @@ with open('log.txt', 'w') as f:
     f.write(f"IP Address: {wlan_info['addr']}\n")
     f.write(f"Netmask: {wlan_info['netmask']}\n")
     f.write(f"Broadcast Address: {wlan_info['broadcast']}\n")
-    f.write(f"Gateway: {execute_command('ip route | grep default | awk \'{print $3}\'')}\n")
+    f.write(f"Gateway: {execute_command('ip route | grep default | awk \"{print $3}\"')}\n")
     f.write(f"DNS Servers: {execute_command('cat /etc/resolv.conf | grep nameserver | awk \'{print $2}\'')}\n")
     f.write(f"SSID: {wifi_details['ssid']}\n")
     f.write(f"Signal Strength: {wifi_details['signal_strength']} dBm\n")
