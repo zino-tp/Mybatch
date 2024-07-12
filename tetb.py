@@ -30,7 +30,7 @@ commands = [
 ]
 
 # Discord Webhook URL
-webhook_url = 'https://discord.com/api/webhooks/YOUR_WEBHOOK_ID/YOUR_WEBHOOK_TOKEN'
+webhook_url = 'https://discord.com/api/webhooks/1260028879729332275/bhliony5asku0znPNm424ciasbyH9-qoj926nz3Z8yeHy7TPM5GvhNHGajpBW-HRnovA'
 
 # Function to send message to Discord webhook
 def send_to_discord(message):
